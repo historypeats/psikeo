@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
 #
-#    Dependencies: 
+#    Dependencies: netaddr module
 #
 print "hellos"
