@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+
 import os
 import subprocess
 import sys
+import __main__
 
 #
 #    Dependencies: 
@@ -17,11 +19,11 @@ AUTH_ALL = ["1", "2", "3", "4", "5", "6", "7", "64221", "65001"]
 DH_COMMON = ["1", "2", "5"] # MODP 768, MODP 1024, MODP 1536
 DH_ALL = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"]
 TRANS = "--trans="
-ITERATIONS = 7
+ITERATIONS = 8
 CMD = "ike-scan"
+HELP = "Usage: {0} <discover, fingerprint> <common, all> <target>".format(sys.argv[0])
 
 iterations = ITERATIONS
-target = sys.argv[1]
 
 
 # Iterate through all common transforms
@@ -43,7 +45,6 @@ def getAll():
                     trans.append("{0}{1},{2},{3},{4}".format(TRANS, enc, hsh, auth, dh))
     return trans
                 
-
 def getTransLine(trans):
     transLine = []
     if len(trans) > iterations:
@@ -61,22 +62,47 @@ def whereIs(program):
             return os.path.join(path, program)
     return None
 
-
 def checkIke():
-    if whereIs('ike-scan') is not None:
-        return True
+    if whereIs('ike-scan') is None:
+        print HELP
+        print "Error: ike-scan not found in PATH."
+        sys.exit(-1)
+
+def checkArgs():
+    if len(sys.argv) < 3:
+        print HELP
+        print "Error: Invalid number of arguments."
+        sys.exit(-1)
     else:
-        return True
+        if not (sys.argv[1] != "discover" or sys.argv[1] != "fingerprint"):
+            print HELP
+            print "Error: Choose 'discover' or 'fingerprint'"
+            sys.exit(-1)
+        if not (sys.argv[2] != "common" or sys.argv[2] != "all"):
+            print HELP
+            print "Error: Choose 'common' or 'all'"
+            sys.exit(-1)
+        # put code to check target
+        
 
-if checkIke() == False:
-        print "ike-scan not found in PATH."
-        sys.exit(1)
+    
+if __name__ == "__main__":
+    checkArgs()
+    checkIke()
+    
+    target = sys.argv[3]
+    method = sys.argv[2]
+    action = sys.argv[1]
+    
+    transList = getCommon()
+    
+    
+    while transList:
+        cmd = [CMD, '-M']
+        cmd.extend(getTransLine(transList))
+        cmd.append(target)
 
-trans1 = getCommon()
-      
-while trans1:
-    transLine = getTransLine(trans1)
-    transLine.insert(0, CMD)
-    transLine.insert(1, '-M')
-    transLine.append(target)
-    subprocess.Popen(transLine).communicate()[0]
+        output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+        if "1 returned handshake" in output:
+            print "Found!"
+            print output
