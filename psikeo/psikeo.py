@@ -74,10 +74,11 @@ if checkIke() == False:
 
 trans1 = getCommon()
       
-while trans1:
-    transLine = getTransLine(trans1)
-    transLine.insert(0, CMD)
+#while trans1:
+#    transLine = getTransLine(trans1)
+#    transLine.insert(0, CMD)
     #transLine.insert(1, '-M')
-    transLine.append(target)
-    subprocess.Popen(transLine).communicate()[0]
+#    transLine.append(target)
 
+for i in trans1:
+    subprocess.Popen([CMD, i, target]).communicate()[0]
