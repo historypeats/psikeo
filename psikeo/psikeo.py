@@ -82,5 +82,5 @@ while trans1:
     test = ["ike-scan"]
     #print transLine
     
-    #subprocess.Popen(transLine).communicate()[0]
+    subprocess.Popen(transLine).communicate()[0]
 
