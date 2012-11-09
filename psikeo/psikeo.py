@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import re
 import subprocess
 import sys
-import __main__
 
 #
 #    Dependencies: 
@@ -84,7 +84,17 @@ def checkArgs():
             sys.exit(-1)
         # put code to check target
         
+def cleanOutput(output):
+    output = output.split("\n")
+    output = [x for x in output if x != ''] # remove empty strings 
+    del output[0] # remove ike-scan banner
+    del output[-1] # remove time completed
 
+    lines = []
+    for i in output:
+        lines.append(i.replace("\t", "").strip())
+    
+    return lines
     
 if __name__ == "__main__":
     checkArgs()
@@ -104,5 +114,5 @@ if __name__ == "__main__":
 
         output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
         if "1 returned handshake" in output:
-            print "Found!"
-            print output
+            display = cleanOutput(output)
+            print display
