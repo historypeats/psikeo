@@ -54,19 +54,30 @@ def getTransLine(trans):
             transLine.append(trans.pop())
     return transLine
 
-def whereis(program):
+def whereIs(program):
     for path in os.environ.get('PATH', '').split(':'):
         if os.path.exists(os.path.join(path, program)) and \
            not os.path.isdir(os.path.join(path, program)):
             return os.path.join(path, program)
     return None
+
+
+def checkIke():
+    if whereIs('ike-scan') is not None:
+        return True
+    else:
+        return False
+
+if checkIke() == False:
+        print "ike-scan not found in PATH."
+        sys.exit(1)
+
 trans1 = getCommon()
-
-print whereis('ike2-scan')
-
+      
 while trans1:
     transLine = getTransLine(trans1)
     transLine.insert(0, CMD)
+    transLine.insert(1, '-M')
     transLine.append(target)
     test = ["ike-scan"]
     #print transLine
