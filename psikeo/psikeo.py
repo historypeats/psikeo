@@ -77,10 +77,7 @@ trans1 = getCommon()
 while trans1:
     transLine = getTransLine(trans1)
     transLine.insert(0, CMD)
-    transLine.insert(1, '-M')
+    #transLine.insert(1, '-M')
     transLine.append(target)
-    test = ["ike-scan"]
-    #print transLine
-    
     subprocess.Popen(transLine).communicate()[0]
 
