@@ -34,17 +34,15 @@ class IKE:
     MODE = None
     IP = None
     
-    '''def __init__(self, vid, enc, hsh, auth, mode, ip):
+    def __init__(self, vid, enc, hsh, auth, mode, ip):
         self.VID = vid
         self.ENC = enc
         self.HASH = hsh
         self.AUTH = auth
         self.MODE = mode
         self.IP = ip
-    '''
-    def __init__(self, ip, mode):
-        self.IP = ip
-        self.MODE = mode
+    
+   
 
 # Iterate through all common transforms
 def getCommon():
@@ -120,16 +118,26 @@ def parseData(data):
     ip = re.compile('(([2][5][0-5]\.)|([2][0-4][0-9]\.)|([0-1]?[0-9]?[0-9]\.)){3}'
                +'(([2][5][0-5])|([2][0-4][0-9])|([0-1]?[0-9]?[0-9]))')
     mode = re.compile('(Main|Aggressive)')
-    ips = ip.search(data[0])
-    modes = mode.search(data[0])
+    auth = re.compile('Auth=[0-9a-zA-Z/]+')
+    dh = re.compile('Group=[:0-9a-zA-Z]+')
+    enc = re.compile('Enc=[0-9a-zA-Z]+')
+    vid = data[2]
+    hsh = re.compile('Hash=[0-9a-zA-Z/]+')
     
-    return ips, modes
+    ips = ip.search(data[0]).group()
+    modes = mode.search(data[0]).group()
+    encs = enc.search(data[1]).group()
+    auths = auth.search(data[1]).group()
+    dhs = dh.search(data[1]).group()
+    hshs = hsh.search(data[1]).group()
+    
+    return vid, encs, hshs, auths, modes, ips
 
 def createIke(data):
-    cleanOutput = cleanOutput(data)
-    ip, mode = parseData(cleanOutput)
+    cleanedOutput = cleanOutput(data)
+    vid, enc, hsh, auth, mode, ip = parseData(cleanedOutput)
     
-    ike = IKE(ip, mode)
+    ike = IKE(vid, enc, hsh, auth, mode, ip)
     return ike
         
 if __name__ == "__main__":
@@ -151,4 +159,8 @@ if __name__ == "__main__":
         output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
         if "1 returned handshake" in output:
             ike = createIke(output)
-            print ike.IP
+            print "Found!",
+            print "IP:", ike.IP,
+            print "Mode:", ike.MODE
+            print "HASH:", ike.HASH
+            print "VID:", ike.VID
