@@ -33,14 +33,16 @@ class IKE:
     AUTH = None
     MODE = None
     IP = None
+    DH = None
     
-    def __init__(self, vid, enc, hsh, auth, mode, ip):
+    def __init__(self, vid, enc, hsh, auth, mode, ip, dh):
         self.VID = vid
         self.ENC = enc
         self.HASH = hsh
         self.AUTH = auth
         self.MODE = mode
         self.IP = ip
+        self.DH = dh
     
    
 
@@ -131,13 +133,13 @@ def parseData(data):
     dhs = dh.search(data[2]).group()
     hshs = hsh.search(data[2]).group()
     
-    return vid, encs, hshs, auths, modes, ips
+    return vid, encs, hshs, auths, modes, ips, dhs
 
 def createIke(data):
     cleanedOutput = cleanOutput(data)
-    vid, enc, hsh, auth, mode, ip = parseData(cleanedOutput)
+    vid, enc, hsh, auth, mode, ip, dh = parseData(cleanedOutput)
     
-    ike = IKE(vid, enc, hsh, auth, mode, ip)
+    ike = IKE(vid, enc, hsh, auth, mode, ip, dh)
     return ike
         
 if __name__ == "__main__":
@@ -165,6 +167,8 @@ if __name__ == "__main__":
                 ike = createIke(output)
                 discovered.append(ike)
                 print "IP:", ike.IP,
+                print "Enc:", ike.ENC
                 print "Mode:", ike.MODE,
                 print "HASH:", ike.HASH,
+                print "Group:", ike.DH,
                 print "VID:", ike.VID
