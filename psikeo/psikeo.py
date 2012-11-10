@@ -167,7 +167,7 @@ if __name__ == "__main__":
                 ike = createIke(output)
                 discovered.append(ike)
                 print "IP:", ike.IP,
-                print "Enc:", ike.ENC
+                print "Enc:", ike.ENC,
                 print "Mode:", ike.MODE,
                 print "HASH:", ike.HASH,
                 print "Group:", ike.DH,
