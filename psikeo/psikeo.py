@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+from psikeo.test import cleanOutput
 
 #
 #    Dependencies: 
@@ -25,6 +26,25 @@ HELP = "Usage: {0} <discover, fingerprint> <common, all> <target>".format(sys.ar
 
 iterations = ITERATIONS
 
+class IKE:
+    VID = None
+    ENC = None
+    HASH = None
+    AUTH = None
+    MODE = None
+    IP = None
+    
+    '''def __init__(self, vid, enc, hsh, auth, mode, ip):
+        self.VID = vid
+        self.ENC = enc
+        self.HASH = hsh
+        self.AUTH = auth
+        self.MODE = mode
+        self.IP = ip
+    '''
+    def __init__(self, ip, mode):
+        self.IP = ip
+        self.MODE = mode
 
 # Iterate through all common transforms
 def getCommon():
@@ -95,7 +115,23 @@ def cleanOutput(output):
         lines.append(i.replace("\t", "").strip())
     
     return lines
+
+def parseData(data):
+    ip = re.compile('(([2][5][0-5]\.)|([2][0-4][0-9]\.)|([0-1]?[0-9]?[0-9]\.)){3}'
+               +'(([2][5][0-5])|([2][0-4][0-9])|([0-1]?[0-9]?[0-9]))')
+    mode = re.compile('(Main|Aggressive)')
+    ips = ip.search(data[0])
+    modes = mode.search(data[0])
     
+    return ips, modes
+
+def createIke(data):
+    cleanOutput = cleanOutput(data)
+    ip, mode = parseData(cleanOutput)
+    
+    ike = IKE(ip, mode)
+    return ike
+        
 if __name__ == "__main__":
     checkArgs()
     checkIke()
@@ -114,5 +150,5 @@ if __name__ == "__main__":
 
         output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
         if "1 returned handshake" in output:
-            display = cleanOutput(output)
-            print display
+            ike = createIke(output)
+            print ike.IP
