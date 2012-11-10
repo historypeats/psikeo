@@ -167,4 +167,4 @@ if __name__ == "__main__":
                 print "IP:", ike.IP,
                 print "Mode:", ike.MODE,
                 print "HASH:", ike.HASH,
-                print "VID:", ike.VID + "\n"
+                print "VID:", ike.VID
