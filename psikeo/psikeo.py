@@ -148,19 +148,23 @@ if __name__ == "__main__":
     method = sys.argv[2]
     action = sys.argv[1]
     
-    transList = getCommon()
-    discovered = []
+    if action == "discover":
+        if method == "all":
+            transList = getAll()
+        else:
+            transList = getCommon()
+        discovered = []
+        
+        while transList:
+            cmd = [CMD, '-M']
+            cmd.extend(getTransLine(transList))
+            cmd.append(target)
     
-    while transList:
-        cmd = [CMD, '-M']
-        cmd.extend(getTransLine(transList))
-        cmd.append(target)
-
-        output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
-        if "1 returned handshake" in output:
-            ike = createIke(output)
-            discovered.append(ike)
-            print "IP:", ike.IP,
-            print "Mode:", ike.MODE,
-            print "HASH:", ike.HASH,
-            print "VID:", ike.VID,
+            output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+            if "1 returned handshake" in output:
+                ike = createIke(output)
+                discovered.append(ike)
+                print "IP:", ike.IP,
+                print "Mode:", ike.MODE,
+                print "HASH:", ike.HASH,
+                print "VID:", ike.VID + "\n"
