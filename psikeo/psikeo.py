@@ -121,15 +121,15 @@ def parseData(data):
     auth = re.compile('Auth=[0-9a-zA-Z/]+')
     dh = re.compile('Group=[:0-9a-zA-Z]+')
     enc = re.compile('Enc=[0-9a-zA-Z]+')
-    vid = data[2]
+    vid = data[3]
     hsh = re.compile('Hash=[0-9a-zA-Z/]+')
     
     ips = ip.search(data[0]).group()
     modes = mode.search(data[0]).group()
-    encs = enc.search(data[1]).group()
-    auths = auth.search(data[1]).group()
-    dhs = dh.search(data[1]).group()
-    hshs = hsh.search(data[1]).group()
+    encs = enc.search(data[2]).group()
+    auths = auth.search(data[2]).group()
+    dhs = dh.search(data[2]).group()
+    hshs = hsh.search(data[2]).group()
     
     return vid, encs, hshs, auths, modes, ips
 
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     action = sys.argv[1]
     
     transList = getCommon()
-    
+    discovered = []
     
     while transList:
         cmd = [CMD, '-M']
@@ -159,8 +159,8 @@ if __name__ == "__main__":
         output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
         if "1 returned handshake" in output:
             ike = createIke(output)
-            print "Found!",
+            discovered.append(ike)
             print "IP:", ike.IP,
-            print "Mode:", ike.MODE
-            print "HASH:", ike.HASH
-            print "VID:", ike.VID
+            print "Mode:", ike.MODE,
+            print "HASH:", ike.HASH,
+            print "VID:", ike.VID,
