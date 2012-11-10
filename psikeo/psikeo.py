@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import sys
-from psikeo.test import cleanOutput
+
 
 #
 #    Dependencies: 
